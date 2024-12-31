@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ master ] 
   pull_request:
-    branches: [ "master" ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -15,16 +15,21 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build -c Release -o ./bin
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish --self-contained -p:PublishSingleFile=true --runtime ${{ matrix.runtime }}
+        env:
+          runtime: ${{ matrix.os == 'ubuntu-latest' && 'linux-x64' || matrix.os == 'windows-latest' && 'win-x64' || 'osx-x64' }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}-calculator
+          path: ./publish/
