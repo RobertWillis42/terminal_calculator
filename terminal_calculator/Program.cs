@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 class Program
 {
     static double Calculate(double num1, double num2, string operation)
@@ -12,16 +13,8 @@ class Program
             case "*":
                 return num1 * num2;
             case "/":
-                if (num1 == 0 || num2 == 0)
-                {
-                    Console.WriteLine("Don't divide by zero!");
-                    return double.NaN;
-                }
-                else
-                {
-                    return num1 / num2;
-                }
-             default:
+                return num1 / num2;
+            default:
                 Console.WriteLine("Invalid input.");
                 return double.NaN;
         }
@@ -30,23 +23,51 @@ class Program
 
     static void Main(string[] args)
     {
-        double num1;
-        double num2;
-        Console.WriteLine("What operation would you like to perform? (+, -, *, /): ");
-        string operation = Console.ReadLine();
-        Console.WriteLine("Please enter your first number: ");
-        while (!Double.TryParse(Console.ReadLine(), out num1))
+        bool repeat = true;
+        do // Loop to make program restart if user chooses to run it again.
         {
-            Console.WriteLine("Invalid Input.");
+            double num1;
+            double num2;
             Console.WriteLine("Please enter your first number: ");
-        }
-        Console.WriteLine("Please enter your second number: ");
-        while (!Double.TryParse(Console.ReadLine(), out num2))
-        {
-            Console.WriteLine("Invalid Input.");
-            Console.WriteLine("Please enter your second number: ");
-        }
-        Console.WriteLine("\n");
-        Console.WriteLine(Calculate(num1, num2, operation));
+            while (!Double.TryParse(Console.ReadLine(), out num1))
+            {
+                Console.WriteLine("\nInvalid Input.\n");
+                Console.WriteLine("Please enter your first number: ");
+            }
+            Console.WriteLine("\nPlease enter your second number: ");
+            while (!Double.TryParse(Console.ReadLine(), out num2))
+            {
+                Console.WriteLine("\nInvalid Input.\n");
+                Console.WriteLine("Please enter your second number: ");
+            }
+
+            Console.WriteLine("\nWhat operation would you like to perform? (+, -, *, /): ");
+            string operation = Console.ReadLine();
+            if (operation == "/" && num1 == 0 || num2 == 0) // Prevent divide by zero.
+            {
+                Console.WriteLine("\nYou can't divide by zero.\n");
+                continue;
+            }
+            double result = Calculate(num1, num2, operation);
+            Console.WriteLine("\nThe answer is " + result + ".");
+            Console.WriteLine("\nWould you like to run the calculator again? (y/n): ");
+            string userRepeatChoice = Console.ReadLine();
+
+            if (userRepeatChoice == "y")
+            {
+                Console.WriteLine("\n");
+                continue;
+            }
+            else if (userRepeatChoice == "n")
+            {
+                repeat = false;
+                Console.WriteLine("\nThank you for using the calculator! Closing now.");
+            }
+            else
+            {
+                Console.WriteLine("\nInvalid input\n");
+                break;
+            }
+        } while (repeat == true);
     }
 }
